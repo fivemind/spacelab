@@ -13,7 +13,9 @@ var lib = [
   require(LIBPATH + 'precision'),
 
   require(LIBPATH + 'select'),
-  require(LIBPATH + 'gpu')
+  require(LIBPATH + 'gpu'),
+
+  require(LIBPATH + 'png')
 
 ]
 .forEach(function(item) {
@@ -155,6 +157,16 @@ var spacelab = {
   }
 };
 
+var color = {
+  gamma: {
+    red: 1.03,
+    blue: 0.925
+  },
+  sigmoid: {
+    contrast: 56,
+    midpoint: 4
+  }
+};
 
 var config = spacelab.sentinel2();
 
@@ -172,11 +184,41 @@ var pipeline = spacelab.pipeline(config)
 
     this.action(function() {
 
-    //! gl_FragColor = this.vis;
+    // RGB
+    // gl_FragColor = this.vis;
+
+    // NRG
+    //! gl_FragColor = vec4(this.vnir[0], this.vis[1], this.vis[2], 0.0);
+
+    // NDVI
+
+    // float ndvi = (this.vnir[0] - this.vis[0]) / (this.vnir[0] + this.vis[0]);
+
+    // gl_FragColor[0] = mix(0.0, this.vis[0], float(ndvi > 0.3 && ndvi < 0.8));
+    // gl_FragColor[1] = mix(0.0, this.vis[1], float(ndvi > 0.3 && ndvi < 0.8));
+    // gl_FragColor[2] = mix(0.0, this.vis[2], float(ndvi > 0.3 && ndvi < 0.8));
+    // gl_FragColor[3] = 0.0;
+
+    // EVI
+
+    // float l = 1.0;
+    // float c1 = 6.0;
+    // float c2 = 7.5;
+    // float g = 2.5;
+
+    // float evi = (this.vnir[0] - this.vis[0]) / (this.vnir[0] + c1 * this.vis[0] - c2 * this.vis[2] + l);
+    // evi *= g;
+
+    // gl_FragColor[0] = mix(0.0, this.vis[0], float(evi > 0.1 && evi < 0.8));
+    // gl_FragColor[1] = mix(0.0, this.vis[1], float(evi > 0.1 && evi < 0.8));
+    // gl_FragColor[2] = mix(0.0, this.vis[2], float(evi > 0.1 && evi < 0.8));
+    // gl_FragColor[3] = 0.0;
 
     });
 
   })
+  .title('export png')
+  .png('png', color)
   .title('end')
   .end()
   ;
