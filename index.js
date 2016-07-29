@@ -1,5 +1,5 @@
 var LIBPATH = __dirname + '/lib/';
-var CACHEPATH = '~/sentinel-s2-l1c/';
+var CACHEPATH = process.env.HOME + '/sentinel-s2-l1c/';
 
 var kue = require('kue');
 var mgrs = require('mgrs');
@@ -8,7 +8,9 @@ kue.app.listen(3000);
 
 var lib = [
 
-  require(LIBPATH + 'dummy')
+  require(LIBPATH + 'crop'),
+  require(LIBPATH + 'divide'),
+  require(LIBPATH + 'precision')
 
 ]
 .forEach(function(item) {
@@ -77,9 +79,9 @@ Pipeline.prototype.createJob = function(priority, job) {
 
 };
 
-Pipeline.prototype.resolveTile = function(tile, type, percision, band, index) {
+Pipeline.prototype.resolveTile = function(tile, type, precision, band, index) {
   return tile
-    .replace('%p', percision)
+    .replace('%p', precision)
     .replace('%b', band)
     .replace('%d', index === null ? '' : index)
     .replace('%t', type)
@@ -105,7 +107,7 @@ Pipeline.prototype._worker = function(job, cb) {
 };
 
 Pipeline.prototype.push = function(tile) {
-  this.createJob('normal', {stage: 0, tile: tile, type: this._tileType, percision: 0, index: null});
+  this.createJob('normal', {stage: 0, tile: tile, type: this._tileType, precision: 0, index: null});
   return this;
 };
 
@@ -132,9 +134,9 @@ function wgs84(pipeline, lonLat) {
 function sentinel2() {
   return {
     name: 'sentinel2',
-    visibleBands: ['01', '02', '03', '04'],
-    vnirBands: ['05', '06', '07', '08'],
-    swirBands: ['09', '10', '11', '12'],
+    visibleBands: ['B01', 'B02', 'B03', 'B04'],
+    vnirBands: ['B05', 'B06', 'B07', 'B08'],
+    swirBands: ['B09', 'B10', 'B11', 'B12'],
     tileType: 'jp2',
     tileWorkingType: 'png',
     tileWidth: 10980,
@@ -153,9 +155,13 @@ var spacelab = {
 
 var config = spacelab.sentinel2();
 
+config.visibleBands = ['B04', 'B03', 'B02'];
+config.vnirBands = ['B08'];
+config.swirBands = [];
+
 var pipeline = spacelab.pipeline(config)
-  .title('dummy')
-  .dummy()
+  .title('precision')
+  .precision(1)
   .title('end')
   .end()
   ;
