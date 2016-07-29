@@ -10,7 +10,10 @@ var lib = [
 
   require(LIBPATH + 'crop'),
   require(LIBPATH + 'divide'),
-  require(LIBPATH + 'precision')
+  require(LIBPATH + 'precision'),
+
+  require(LIBPATH + 'select'),
+  require(LIBPATH + 'gpu')
 
 ]
 .forEach(function(item) {
@@ -162,6 +165,18 @@ config.swirBands = [];
 var pipeline = spacelab.pipeline(config)
   .title('precision')
   .precision(1)
+  .title('select')
+  .select()
+  .title('gpu')
+  .gpu(function() {
+
+    this.action(function() {
+
+    //! gl_FragColor = this.vis;
+
+    });
+
+  })
   .title('end')
   .end()
   ;
